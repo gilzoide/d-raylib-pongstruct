@@ -24,7 +24,7 @@
       "targetType": "library",
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],
-      "postBuildCommands": ["emcc build/librayd-base.a lib/raylib-bin/wasm/libraylib.bc -s USE_GLFW=3 -o build/rayd-base.html"]
+      "postBuildCommands": ["emcc build/librayd-base.a lib/raylib-bin/wasm/libraylib.bc -s USE_GLFW=3 -o build/index.html"]
     }
   ],
   "targetPath": "build",
