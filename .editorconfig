@@ -1,0 +1,9 @@
+root = true
+
+[*.{d,di}]
+indent_style = tabs
+indent_size = 4
+
+[*.json]
+indent_style = spaces
+indent_size = 2

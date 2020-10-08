@@ -1,0 +1,32 @@
+{
+  "name": "rayd-base",
+  "description": "D + Raylib powered Pong game with no class (structs only)",
+  "authors": [
+    "gilzoide"
+  ],
+  "homepage": "https://github.com/gilzoide/d-raylib-pongstruct",
+  "license": "public domain",
+  "buildOptions": [
+    "betterC"
+  ],
+  "importPaths": [
+    "lib/raylib-d/source",
+    "lib/druntime/src"
+  ],
+  "configurations": [
+    {
+      "name": "desktop",
+      "libs": ["raylib"]
+    },
+    {
+      "name": "web",
+      "platforms": ["Emscripten"],
+      "targetType": "library",
+      "dflags": ["-mtriple=wasm32"],
+      "lflags": ["--output-bc"],
+      "postBuildCommands": ["emcc build/librayd-base.a lib/raylib-bin/wasm/libraylib.bc -s USE_GLFW=3 -o build/rayd-base.html"]
+    }
+  ],
+  "targetPath": "build",
+  "targetType": "executable"
+}

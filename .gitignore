@@ -1,0 +1,14 @@
+.dub
+docs.json
+__dummy.html
+docs/
+*.exe
+*.a
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.lst
+
+build/

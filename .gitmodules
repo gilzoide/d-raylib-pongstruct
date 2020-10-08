@@ -1,0 +1,7 @@
+[submodule "lib/raylib-d"]
+	path = lib/raylib-d
+	url = https://github.com/onroundit/raylib-d.git
+[submodule "lib/druntime"]
+	path = lib/druntime
+	url = https://github.com/skoppe/druntime.git
+	branch = wasm
