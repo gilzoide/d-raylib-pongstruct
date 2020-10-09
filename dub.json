@@ -26,7 +26,6 @@
       "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/windows.x86"],
       "libs": ["raylib"],
       "platforms": ["Windows"],
-      "postBuildCommands": ["make win32"],
       "targetName": "rayd-base",
       "targetPath": "build/win32",
       "targetType": "library"
@@ -36,7 +35,6 @@
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],
       "platforms": ["Emscripten"],
-      "postBuildCommands": ["make web"],
       "targetPath": "build/web",
       "targetType": "library"
     }
