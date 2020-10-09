@@ -10,17 +10,23 @@ struct Ball
     mixin InheritStruct!FilledCircle;
 
     Vector2 velocity = { ballVelocity, ballVelocity };
+    bool hitLeftEdge = false;
+    bool hitRightEdge = false;
 
     void update(float dt)
     {
         position.x += dt * velocity.x;
         position.y += dt * velocity.y;
 
-        if (position.x - radius < 0 || position.x + radius > windowWidth) {
-            velocity.x = -velocity.x;
+        hitLeftEdge = position.x - radius < 0;
+        hitRightEdge = position.x + radius > windowWidth;
+
+        if (position.y - radius < 0) {
+            velocity.y = ballVelocity;
         }
-        if (position.y - radius < 0 || position.y + radius > windowHeight) {
-            velocity.y = -velocity.y;
+        else if (position.y + radius > windowHeight)
+        {
+            velocity.y = -ballVelocity;
         }
     }
 }
@@ -88,15 +94,39 @@ struct PongGame
 
     Ball ball = {
         position: { windowWidth * 0.5, windowHeight * 0.5 },
-        radius: 20,
+        radius: 15,
     };
 
+    int p1Points = 0;
+    int p2Points = 0;
+
+    void resetBall(bool goingLeft)
+    {
+        with (ball)
+        {
+            position = PongGame.init.ball.position;
+            velocity = Vector2((goingLeft ? ballVelocity : -ballVelocity), ballVelocity);
+        }
+    }
 
     mixin UpdateDraw;
 
     void update(float dt)
     {
         updateChildren(dt);
+
+        if (ball.hitLeftEdge)
+        {
+            p2Points++;
+            ball.hitLeftEdge = false;
+            resetBall(true);
+        }
+        else if (ball.hitRightEdge)
+        {
+            p1Points++;
+            ball.hitRightEdge = false;
+            resetBall(false);
+        }
     }
 
     void draw()
