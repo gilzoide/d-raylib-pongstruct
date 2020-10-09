@@ -16,15 +16,29 @@
   "configurations": [
     {
       "name": "desktop",
+      "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/$PLATFORM.$ARCH"],
       "libs": ["raylib"]
     },
     {
+      "name": "win32",
+      "copyFiles": ["$PACKAGE_DIR/lib/raylib-bin/windows.x86/raylib.dll"],
+      "dflags": ["-mtriple=i686-w64-mingw32"],
+      "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/windows.x86"],
+      "libs": ["raylib"],
+      "platforms": ["Windows"],
+      "postBuildCommands": ["make win32"],
+      "targetName": "rayd-base",
+      "targetPath": "build/win32",
+      "targetType": "library"
+    },
+    {
       "name": "web",
-      "platforms": ["Emscripten"],
-      "targetType": "library",
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],
-      "postBuildCommands": ["emcc build/librayd-base.a lib/raylib-bin/wasm/libraylib.bc -s USE_GLFW=3 -o build/index.html"]
+      "platforms": ["Emscripten"],
+      "postBuildCommands": ["make web"],
+      "targetPath": "build/web",
+      "targetType": "library"
     }
   ],
   "targetPath": "build",
