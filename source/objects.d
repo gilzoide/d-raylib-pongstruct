@@ -68,7 +68,7 @@ struct Paddle
         }
     }
     
-    void draw()
+    void draw() const
     {
         DrawRectangleRounded(getRectangle(), 12, 12, color);
     }
@@ -91,17 +91,16 @@ struct PongGame
         radius: 20,
     };
 
+
+    mixin UpdateDraw;
+
     void update(float dt)
     {
-        paddle1.update(dt);
-        paddle2.update(dt);
-        ball.update(dt);
+        updateChildren(dt);
     }
 
     void draw()
     {
-        paddle1.draw();
-        paddle2.draw();
-        ball.draw();
+        drawChildren();
     }
 }
