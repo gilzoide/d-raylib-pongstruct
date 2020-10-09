@@ -9,3 +9,5 @@ enum ballVelocity = 300;
 enum paddleWidth = 20;
 enum paddleHeight = 100;
 enum paddleVelocity = 400;
+
+enum scoreFontSize = 34;

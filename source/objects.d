@@ -80,6 +80,27 @@ struct Paddle
     }
 }
 
+struct Score
+{
+    Vector2 position;
+    Color color = Colors.WHITE;
+
+    int points;
+    private char[4] buffer = "0";
+
+    void increment()
+    {
+        points++;
+        import core.stdc.stdio;
+        sprintf(cast(char *) buffer, "%d", points);
+    }
+
+    void draw()
+    {
+        DrawText(cast(char *) buffer, cast(int) position.x, cast(int) position.y, scoreFontSize, color);
+    }
+}
+
 
 struct PongGame
 {
@@ -90,6 +111,13 @@ struct PongGame
     };
     Paddle paddle2 = {
         position: { windowWidth - paddleWidth, 0.5 * windowHeight },
+    };
+
+    Score score1 = {
+        position: { windowWidth * 0.25, 20 },
+    };
+    Score score2 = {
+        position: { windowWidth * 0.75, 20 },
     };
 
     Ball ball = {
@@ -117,13 +145,13 @@ struct PongGame
 
         if (ball.hitLeftEdge)
         {
-            p2Points++;
+            score2.increment();
             ball.hitLeftEdge = false;
             resetBall(true);
         }
         else if (ball.hitRightEdge)
         {
-            p1Points++;
+            score1.increment();
             ball.hitRightEdge = false;
             resetBall(false);
         }
