@@ -8,13 +8,16 @@ struct Circle
 	Vector2 position = { 0, 0 };
 	float radius = 10;
 
-	bool CheckCollision(Vector2 point) const {
+	bool CheckCollision(Vector2 point) const
+    {
 		return CheckCollisionPointCircle(point, position, radius);
 	}
-    bool CheckCollision(Circle other) const {
+    bool CheckCollision(Circle other) const
+    {
         return CheckCollisionCircles(position, radius, other.position, other.radius);
     }
-    bool CheckCollision(Rectangle rect) const {
+    bool CheckCollision(Rectangle rect) const
+    {
         return CheckCollisionCircleRec(position, radius, rect);
     }
 }
@@ -25,7 +28,8 @@ struct FilledCircle
 
 	Color color = Colors.WHITE;
 
-	void draw() const {
+	void draw()
+    {
 		DrawCircleV(position, radius, color);
 	}
 }
@@ -36,7 +40,8 @@ struct FilledRectangle
 	Rectangle rect = { 0, 0, 100, 100 };
 	Color color = Colors.WHITE;
 
-	void draw() const {
+	void draw()
+    {
 		DrawRectangleRec(rect, color);
 	}
 }

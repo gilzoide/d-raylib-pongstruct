@@ -8,6 +8,7 @@ import shapes;
 struct Ball
 {
     mixin InheritStruct!FilledCircle;
+    mixin GameObject;
 
     Vector2 velocity = { ballVelocity, ballVelocity };
     bool hitLeftEdge = false;
@@ -33,6 +34,8 @@ struct Ball
 
 struct Paddle
 {
+    mixin GameObject;
+
     Vector2 position;
     Vector2 size = { paddleWidth, paddleHeight };
     float linearVelocity = paddleVelocity;
@@ -74,7 +77,7 @@ struct Paddle
         }
     }
     
-    void draw() const
+    void draw()
     {
         DrawRectangleRounded(getRectangle(), 12, 12, color);
     }
@@ -82,6 +85,8 @@ struct Paddle
 
 struct Score
 {
+    mixin GameObject;
+
     Vector2 position;
     Color color = Colors.WHITE;
 
@@ -104,6 +109,8 @@ struct Score
 
 struct PongGame
 {
+    mixin GameObject;
+
     Paddle paddle1 = {
         position: { paddleWidth, 0.5 * windowHeight },
         upKey: KeyboardKey.KEY_W,
@@ -125,8 +132,11 @@ struct PongGame
         radius: 15,
     };
 
-    int p1Points = 0;
-    int p2Points = 0;
+    void initialize()
+    {
+        initializeChildren();
+        resetBall(true);
+    }
 
     void resetBall(bool goingLeft)
     {
@@ -136,8 +146,6 @@ struct PongGame
             velocity = Vector2((goingLeft ? ballVelocity : -ballVelocity), ballVelocity);
         }
     }
-
-    mixin UpdateDraw;
 
     void update(float dt)
     {
@@ -155,10 +163,5 @@ struct PongGame
             ball.hitRightEdge = false;
             resetBall(false);
         }
-    }
-
-    void draw()
-    {
-        drawChildren();
     }
 }
