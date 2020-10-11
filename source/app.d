@@ -1,8 +1,10 @@
-import raylib;
+import cdefs;
 import objects;
+import raylib;
 
 PongGame game;
 
+extern(C)
 void UpdateDrawFrame()
 {
     float dt = GetFrameTime();
@@ -16,12 +18,6 @@ void UpdateDrawFrame()
             DrawFPS(0, 0);
         }
 	EndDrawing();
-}
-
-version (WebAssembly)
-{
-    alias em_callback_func = void function();
-    extern(C) void emscripten_set_main_loop(em_callback_func, int, int);
 }
 
 extern(C)

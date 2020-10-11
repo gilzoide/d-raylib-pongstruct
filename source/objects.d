@@ -1,5 +1,6 @@
 module objects;
 
+import cdefs;
 import constants;
 import inherit_struct;
 import raylib;
@@ -140,7 +141,6 @@ struct Score
     void increment()
     {
         points++;
-        import core.stdc.stdio;
         sprintf(cast(char *) buffer, "%d", points);
     }
 
