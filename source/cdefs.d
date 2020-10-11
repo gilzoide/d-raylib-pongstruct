@@ -3,6 +3,7 @@ module cdefs;
 extern(C):
 
 // core.stdc.stdio gives an error for mingw, so import definitions here
+int printf(const char *, ...);
 int sprintf(char *, const char *, ...);
 
 // emscripten definitions
