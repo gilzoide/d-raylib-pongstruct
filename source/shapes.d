@@ -5,17 +5,53 @@ import raylib;
 
 struct Circle
 {
-	Vector2 position = { 0, 0 };
+	Vector2 center = { 0, 0 };
 	float radius = 10;
 
-	bool CheckCollision(Vector2 point) const {
-		return CheckCollisionPointCircle(point, position, radius);
-	}
-    bool CheckCollision(Circle other) const {
-        return CheckCollisionCircles(position, radius, other.position, other.radius);
+    @property float top() const
+    {
+        return center.y - radius;
     }
-    bool CheckCollision(Rectangle rect) const {
-        return CheckCollisionCircleRec(position, radius, rect);
+    @property void top(float value)
+    {
+        center.y = value + radius;
+    }
+    @property float left() const
+    {
+        return center.x - radius;
+    }
+    @property void left(float value)
+    {
+        center.x = value + radius;
+    }
+    @property float bottom() const
+    {
+        return center.y + radius;
+    }
+    @property void bottom(float value)
+    {
+        center.y = value - radius;
+    }
+    @property float right() const
+    {
+        return center.x + radius;
+    }
+    @property void right(float value)
+    {
+        center.x = value - radius;
+    }
+
+	bool checkCollision(Vector2 point) const
+    {
+		return CheckCollisionPointCircle(point, center, radius);
+	}
+    bool checkCollision(Circle other) const
+    {
+        return CheckCollisionCircles(center, radius, other.center, other.radius);
+    }
+    bool checkCollision(Rectangle rect) const
+    {
+        return CheckCollisionCircleRec(center, radius, rect);
     }
 }
 
@@ -25,8 +61,9 @@ struct FilledCircle
 
 	Color color = Colors.WHITE;
 
-	void draw() const {
-		DrawCircleV(position, radius, color);
+	void draw()
+    {
+		DrawCircleV(center, radius, color);
 	}
 }
 
@@ -36,7 +73,8 @@ struct FilledRectangle
 	Rectangle rect = { 0, 0, 100, 100 };
 	Color color = Colors.WHITE;
 
-	void draw() const {
+	void draw()
+    {
 		DrawRectangleRec(rect, color);
 	}
 }

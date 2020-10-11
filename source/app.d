@@ -29,7 +29,7 @@ void main()
 {
     InitWindow(800, 600, "PongStruct");
 
-    SetTargetFPS(60);
+    game.initialize();
 
     version (WebAssembly)
     {
@@ -37,6 +37,7 @@ void main()
     }
     else
     {
+        SetTargetFPS(61);
         while (!WindowShouldClose())
         {
             UpdateDrawFrame();
