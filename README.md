@@ -1,6 +1,6 @@
 # PongStruct
 [D](https://dlang.org/) + [raylib](https://github.com/raysan5/raylib)
-powered Pong game with no class (structs only).
+powered Pong game with no class (structs only). Play it [here!](https://gilzoide.github.io/d-raylib-pongstruct/)
 
 
 ## Compiling
