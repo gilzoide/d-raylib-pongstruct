@@ -28,7 +28,7 @@
       "platforms": ["Windows"],
       "targetName": "rayd-base",
       "targetPath": "build/win32",
-      "targetType": "library"
+      "targetType": "staticLibrary"
     },
     {
       "name": "web",
@@ -36,7 +36,7 @@
       "lflags": ["--output-bc"],
       "platforms": ["Emscripten"],
       "targetPath": "build/web",
-      "targetType": "library"
+      "targetType": "staticLibrary"
     }
   ],
   "targetPath": "build",
