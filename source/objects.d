@@ -3,7 +3,6 @@ module objects;
 import constants;
 import inherit_struct;
 import raylib;
-import raylib_ext;
 import shapes;
 
 enum MoveDirection {
@@ -29,10 +28,13 @@ MoveDirection directionFromUpDown(bool up, bool down)
 
 struct Ball
 {
-    mixin InheritStruct!FilledCircle;
     mixin GameObject;
 
+    Circle circle;
+    alias circle this;
+
     Vector2 velocity = { ballVelocity, ballVelocity };
+    Color color = Colors.WHITE;
     bool hitLeftEdge = false;
     bool hitRightEdge = false;
 
@@ -70,17 +72,23 @@ struct Ball
             velocity.y = -ballVelocity;
         }
     }
+
+    void draw()
+    {
+        circle.draw(color);
+    }
 }
 
 struct Paddle
 {
     mixin GameObject;
 
-    Rectangle rect = {
-        width: paddleWidth,
-        height: paddleHeight,
+    Frame rect = {
+        rect: {
+            width: paddleWidth,
+            height: paddleHeight,
+        },
     };
-
     alias rect this;
 
     float linearVelocity = paddleVelocity;
@@ -114,7 +122,7 @@ struct Paddle
     
     void draw()
     {
-        DrawRectangleRounded(rect, 12, 12, color);
+        rect.drawRounded(rect.width, 12, color);
     }
 }
 
@@ -164,8 +172,10 @@ struct PongGame
     };
 
     Ball ball = {
-        center: { windowWidth * 0.5, windowHeight * 0.5 },
-        radius: 15,
+        circle: {
+            center: { windowWidth * 0.5, windowHeight * 0.5 },
+            radius: 15,
+        },
     };
 
     void initialize()
