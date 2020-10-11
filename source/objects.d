@@ -8,6 +8,11 @@ import shapes;
 
 import std.algorithm.comparison : max, min;
 
+version (WebAssembly)
+{
+    version = TouchSupport;
+}
+
 enum MoveDirection {
     none,
     up,
@@ -166,18 +171,21 @@ struct PongGame
     Paddle paddle1;
     Paddle paddle2;
 
-    Rectangle paddle1TouchArea = {
-        x: 1,
-        y: paddleHeight * 0.5,
-        width: windowWidth * 0.4,
-        height: windowHeight - paddleHeight * 0.5,
-    };
-    Rectangle paddle2TouchArea = {
-        x: windowWidth * 0.6,
-        y: paddleHeight * 0.5,
-        width: windowWidth * 0.4,
-        height: windowHeight - paddleHeight * 0.5,
-    };
+    version (TouchSupport)
+    {
+        Rectangle paddle1TouchArea = {
+            x: 1,
+            y: paddleHeight * 0.5,
+            width: windowWidth * 0.4,
+            height: windowHeight - paddleHeight * 0.5,
+        };
+        Rectangle paddle2TouchArea = {
+            x: windowWidth * 0.6,
+            y: paddleHeight * 0.5,
+            width: windowWidth * 0.4,
+            height: windowHeight - paddleHeight * 0.5,
+        };
+    }
 
     Score score1 = {
         x: cast(int) (windowWidth * 0.25),
@@ -215,6 +223,17 @@ struct PongGame
         }
     }
 
+    float paddleTargetY(const Frame paddle, KeyboardKey upKey, KeyboardKey downKey)
+    {
+        auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
+        switch (movingTo)
+        {
+            case MoveDirection.up: return 0;
+            case MoveDirection.down: return windowHeight;
+            default: return paddle.centerY;
+        }
+    }
+
     float paddleTargetY(const Frame paddle, const Rectangle touchArea, KeyboardKey upKey, KeyboardKey downKey)
     {
         auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
@@ -239,8 +258,16 @@ struct PongGame
 
     void update(float dt)
     {
-        paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
-        paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+        version (TouchSupport)
+        {
+            paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+            paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+        }
+        else
+        {
+            paddle1.targetY = paddleTargetY(paddle1, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+            paddle2.targetY = paddleTargetY(paddle2, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+        }
 
         updateChildren(dt);
 
