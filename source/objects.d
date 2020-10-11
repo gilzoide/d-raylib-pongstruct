@@ -171,9 +171,9 @@ struct PongGame
     void initialize()
     {
         initializeChildren();
-        paddle1.x = paddleWidth;
+        paddle1.x = paddleWidth * 0.5;
         paddle1.y = 0.5 * windowHeight;
-        paddle2.x = windowWidth - paddleWidth;
+        paddle2.x = windowWidth - paddleWidth * 1.5;
         paddle2.y = 0.5 * windowHeight;
         resetBall(true);
     }
