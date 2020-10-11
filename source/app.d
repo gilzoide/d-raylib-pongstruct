@@ -23,6 +23,10 @@ void UpdateDrawFrame()
 extern(C)
 void main()
 {
+    debug {} else
+    {
+        SetTraceLogLevel(TraceLogType.LOG_ERROR);
+    }
     InitWindow(800, 600, "PongStruct");
 
     game.initialize();
