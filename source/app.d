@@ -1,8 +1,10 @@
-import raylib;
+import cdefs;
 import objects;
+import raylib;
 
 PongGame game;
 
+extern(C)
 void UpdateDrawFrame()
 {
     float dt = GetFrameTime();
@@ -18,15 +20,13 @@ void UpdateDrawFrame()
 	EndDrawing();
 }
 
-version (WebAssembly)
-{
-    alias em_callback_func = void function();
-    extern(C) void emscripten_set_main_loop(em_callback_func, int, int);
-}
-
 extern(C)
 void main()
 {
+    debug {} else
+    {
+        SetTraceLogLevel(TraceLogType.LOG_ERROR);
+    }
     InitWindow(800, 600, "PongStruct");
 
     game.initialize();

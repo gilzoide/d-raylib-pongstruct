@@ -1,10 +1,12 @@
 module objects;
 
+import cdefs;
 import constants;
 import inherit_struct;
 import raylib;
-import raylib_ext;
 import shapes;
+
+import std.algorithm.comparison : max, min;
 
 enum MoveDirection {
     none,
@@ -29,10 +31,13 @@ MoveDirection directionFromUpDown(bool up, bool down)
 
 struct Ball
 {
-    mixin InheritStruct!FilledCircle;
     mixin GameObject;
 
+    Circle circle;
+    alias circle this;
+
     Vector2 velocity = { ballVelocity, ballVelocity };
+    Color color = Colors.WHITE;
     bool hitLeftEdge = false;
     bool hitRightEdge = false;
 
@@ -70,51 +75,63 @@ struct Ball
             velocity.y = -ballVelocity;
         }
     }
+
+    void draw()
+    {
+        circle.draw(color);
+    }
 }
 
 struct Paddle
 {
     mixin GameObject;
 
-    Rectangle rect = {
-        width: paddleWidth,
-        height: paddleHeight,
+    Frame rect = {
+        rect: {
+            width: paddleWidth,
+            height: paddleHeight,
+        },
     };
-
     alias rect this;
 
     float linearVelocity = paddleVelocity;
     Color color = Colors.WHITE;
 
-    KeyboardKey upKey = KeyboardKey.KEY_UP;
-    KeyboardKey downKey = KeyboardKey.KEY_DOWN;
+    float targetY;
     MoveDirection movingTo;
 
     void update(float dt)
     {
-        movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
-        float halfHeight = 0.5 * rect.height;
-        if (movingTo == MoveDirection.up)
+        float targetDelta = targetY - centerY;
+        if (targetDelta < -float.epsilon)
         {
-            rect.y -= dt * linearVelocity;
+            movingTo = MoveDirection.up;
+            float delta = max(targetDelta, -dt * linearVelocity);
+            rect.y += delta;
             if (rect.y < 0)
             {
                 rect.y = 0;
             }
         }
-        else if (movingTo == MoveDirection.down)
+        else if (targetDelta > float.epsilon)
         {
-            rect.y += dt * linearVelocity;
+            movingTo = MoveDirection.down;
+            float delta = min(targetDelta, dt * linearVelocity);
+            rect.y += delta;
             if (rect.bottom > windowHeight)
             {
                 rect.y = windowHeight - rect.height;
             }
         }
+        else
+        {
+            movingTo = MoveDirection.none;
+        }
     }
     
     void draw()
     {
-        DrawRectangleRounded(rect, 12, 12, color);
+        rect.drawRounded(rect.width, 12, color);
     }
 }
 
@@ -132,7 +149,6 @@ struct Score
     void increment()
     {
         points++;
-        import core.stdc.stdio;
         sprintf(cast(char *) buffer, "%d", points);
     }
 
@@ -147,11 +163,20 @@ struct PongGame
 {
     mixin GameObject;
 
-    Paddle paddle1 = {
-        upKey: KeyboardKey.KEY_W,
-        downKey: KeyboardKey.KEY_S,
+    Paddle paddle1;
+    Paddle paddle2;
+
+    Rectangle paddle1TouchArea = {
+        x: 1,
+        y: paddleHeight * 0.5,
+        width: windowWidth * 0.4,
+        height: windowHeight - paddleHeight * 0.5,
     };
-    Paddle paddle2 = {
+    Rectangle paddle2TouchArea = {
+        x: windowWidth * 0.6,
+        y: paddleHeight * 0.5,
+        width: windowWidth * 0.4,
+        height: windowHeight - paddleHeight * 0.5,
     };
 
     Score score1 = {
@@ -164,17 +189,20 @@ struct PongGame
     };
 
     Ball ball = {
-        center: { windowWidth * 0.5, windowHeight * 0.5 },
-        radius: 15,
+        circle: {
+            center: { windowWidth * 0.5, windowHeight * 0.5 },
+            radius: 15,
+        },
     };
 
     void initialize()
     {
+        SetGesturesEnabled(GestureType.GESTURE_TAP);
         initializeChildren();
         paddle1.x = paddleWidth * 0.5;
-        paddle1.y = 0.5 * windowHeight;
+        paddle1.centerY = 0.5 * windowHeight;
         paddle2.x = windowWidth - paddleWidth * 1.5;
-        paddle2.y = 0.5 * windowHeight;
+        paddle2.centerY = 0.5 * windowHeight;
         resetBall(true);
     }
 
@@ -187,8 +215,33 @@ struct PongGame
         }
     }
 
+    float paddleTargetY(const Frame paddle, const Rectangle touchArea, KeyboardKey upKey, KeyboardKey downKey)
+    {
+        auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
+        switch (movingTo)
+        {
+            case MoveDirection.up: return 0;
+            case MoveDirection.down: return windowHeight;
+            default: break;
+        }
+
+        import touch_input;
+        Vector2 touch = touchInsideRect(touchArea);
+        if (touch.y >= 0)
+        {
+            return touch.y;
+        }
+        else
+        {
+            return paddle.centerY;
+        }
+    }
+
     void update(float dt)
     {
+        paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+        paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+
         updateChildren(dt);
 
         if (ball.center.x < windowWidth * 0.5)

@@ -21,8 +21,10 @@ mixin template InheritStruct(T)
 
 mixin template GameObject()
 {
+    private alias T = typeof(this);
+
     import std.traits : Fields, FieldNameTuple, hasMember;
-    void initializeChildren(this T)()
+    void initializeChildren()
     {
         static foreach (i, fieldName; FieldNameTuple!T)
         {
@@ -33,7 +35,7 @@ mixin template GameObject()
         }
     }
 
-    void updateChildren(this T)(float dt)
+    void updateChildren(float dt)
     {
         static foreach (i, fieldName; FieldNameTuple!T)
         {
@@ -44,7 +46,7 @@ mixin template GameObject()
         }
     }
 
-    void drawChildren(this T)()
+    void drawChildren()
     {
         static foreach (i, fieldName; FieldNameTuple!T)
         {
@@ -55,21 +57,21 @@ mixin template GameObject()
         }
     }
 
-    static if (!hasMember!(typeof(this), "initialize"))
+    static if (!hasMember!(T, "initialize"))
     {
         void initialize()
         {
             initializeChildren();
         }
     }
-    static if (!hasMember!(typeof(this), "update"))
+    static if (!hasMember!(T, "update"))
     {
         void update(float dt)
         {
             updateChildren(dt);
         }
     }
-    static if (!hasMember!(typeof(this), "draw"))
+    static if (!hasMember!(T, "draw"))
     {
         void draw()
         {
