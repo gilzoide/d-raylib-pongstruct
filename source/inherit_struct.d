@@ -14,8 +14,9 @@ mixin template InheritStruct(T)
     import std.traits : Fields, FieldNameTuple;
     static foreach (i, fieldName; FieldNameTuple!T)
     {
-        mixin(Fields!T[i].stringof ~ " " ~ fieldName ~ " = " ~ T.stringof ~ ".init." ~ fieldName ~ ";\n");
+        mixin(Fields!T[i].stringof ~ " " ~ fieldName ~ " = superStruct.init." ~ fieldName ~ ";\n");
     }
+
 }
 
 mixin template GameObject()

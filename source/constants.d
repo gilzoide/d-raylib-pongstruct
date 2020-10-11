@@ -5,6 +5,7 @@ enum windowHeight = 600;
 enum windowTitle = "PONGStruct";
 
 enum ballVelocity = 300;
+enum ballReflectionVelocity = 15;
 
 enum paddleWidth = 20;
 enum paddleHeight = 100;
