@@ -17,6 +17,12 @@ WEB_BUILD_LIB=$(WEB_BUILD_PATH)/lib$(PACKAGE).a
 WEB_BUILD_EXE=$(WEB_BUILD_PATH)/index.html
 WEB_RAYLIB=lib/raylib-bin/wasm/libraylib.bc
 
+default:
+	dub build --compiler=ldc --parallel
+
+run:
+	dub --compiler=ldc --parallel
+
 
 $(WEB_BUILD_LIB): $(DUB_PREREQUISITES)
 	dub build --compiler=ldc --config=web --parallel
