@@ -31,6 +31,28 @@
       "targetType": "staticLibrary"
     },
     {
+      "name": "linux32",
+      "copyFiles": ["$PACKAGE_DIR/lib/raylib-bin/linux.x86/libraylib.so", "$PACKAGE_DIR/lib/raylib-bin/linux.x86/libraylib.so.301", "$PACKAGE_DIR/lib/raylib-bin/linux.x86/libraylib.so.3.0.0", "$PACKAGE_DIR/scripts/run.sh"],
+      "dflags": ["-mtriple=i686-pc-linux-gnu"],
+      "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/linux.x86"],
+      "libs": ["raylib"],
+      "platforms": ["Linux"],
+      "targetName": "rayd-base",
+      "targetPath": "build/linux32",
+      "targetType": "staticLibrary"
+    },
+    {
+      "name": "linux64",
+      "copyFiles": ["$PACKAGE_DIR/lib/raylib-bin/linux.x86_64/libraylib.so", "$PACKAGE_DIR/lib/raylib-bin/linux.x86_64/libraylib.so.301", "$PACKAGE_DIR/lib/raylib-bin/linux.x86_64/libraylib.so.3.0.0", "$PACKAGE_DIR/scripts/run.sh"],
+      "dflags": ["-mtriple=x86_64-pc-linux-gnu"],
+      "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/linux.x86_64"],
+      "libs": ["raylib"],
+      "platforms": ["Linux"],
+      "targetName": "rayd-base",
+      "targetPath": "build/linux64",
+      "targetType": "staticLibrary"
+    },
+    {
       "name": "web",
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],

@@ -152,3 +152,21 @@ struct Frame
     }
 }
 
+struct CenteredText
+{
+    int fontSize = 12;
+    int x, y, width;
+    Color color = Colors.WHITE;
+    string text = "";
+
+    void initialize()
+    {
+        width = MeasureText(cast(const char*) text, fontSize);
+    }
+
+    void draw()
+    {
+        DrawText(cast(const char*) text, x - width / 2, y - fontSize / 2, fontSize, color);
+    }
+}
+

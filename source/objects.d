@@ -8,6 +8,11 @@ import shapes;
 
 import std.algorithm.comparison : max, min;
 
+version (WebAssembly)
+{
+    version = TouchSupport;
+}
+
 enum MoveDirection {
     none,
     up,
@@ -163,21 +168,25 @@ struct PongGame
 {
     mixin GameObject;
 
+    bool paused;
     Paddle paddle1;
     Paddle paddle2;
 
-    Rectangle paddle1TouchArea = {
-        x: 1,
-        y: paddleHeight * 0.5,
-        width: windowWidth * 0.4,
-        height: windowHeight - paddleHeight * 0.5,
-    };
-    Rectangle paddle2TouchArea = {
-        x: windowWidth * 0.6,
-        y: paddleHeight * 0.5,
-        width: windowWidth * 0.4,
-        height: windowHeight - paddleHeight * 0.5,
-    };
+    version (TouchSupport)
+    {
+        Rectangle paddle1TouchArea = {
+            x: 1,
+            y: paddleHeight * 0.5,
+            width: windowWidth * 0.4,
+            height: windowHeight - paddleHeight * 0.5,
+        };
+        Rectangle paddle2TouchArea = {
+            x: windowWidth * 0.6,
+            y: paddleHeight * 0.5,
+            width: windowWidth * 0.4,
+            height: windowHeight - paddleHeight * 0.5,
+        };
+    }
 
     Score score1 = {
         x: cast(int) (windowWidth * 0.25),
@@ -193,6 +202,13 @@ struct PongGame
             center: { windowWidth * 0.5, windowHeight * 0.5 },
             radius: 15,
         },
+    };
+
+    CenteredText pauseText = {
+        x: windowWidth / 2,
+        y: windowHeight / 2,
+        fontSize: 70,
+        text: "PAUSED",
     };
 
     void initialize()
@@ -212,6 +228,17 @@ struct PongGame
         {
             center = PongGame.init.ball.center;
             velocity = Vector2((goingLeft ? ballVelocity : -ballVelocity), ballVelocity);
+        }
+    }
+
+    float paddleTargetY(const Frame paddle, KeyboardKey upKey, KeyboardKey downKey)
+    {
+        auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
+        switch (movingTo)
+        {
+            case MoveDirection.up: return 0;
+            case MoveDirection.down: return windowHeight;
+            default: return paddle.centerY;
         }
     }
 
@@ -239,39 +266,64 @@ struct PongGame
 
     void update(float dt)
     {
-        paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
-        paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
-
-        updateChildren(dt);
-
-        if (ball.center.x < windowWidth * 0.5)
+        if (IsKeyPressed(KeyboardKey.KEY_ENTER))
         {
-            if (ball.checkCollision(paddle1))
+            paused = !paused;
+        }
+
+        if (!paused)
+        {
+            version (TouchSupport)
             {
-                ball.reflect(paddle1.movingTo);
-                ball.left = paddle1.right;
+                paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+                paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+            }
+            else
+            {
+                paddle1.targetY = paddleTargetY(paddle1, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+                paddle2.targetY = paddleTargetY(paddle2, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+            }
+
+            updateChildren(dt);
+
+            if (ball.center.x < windowWidth * 0.5)
+            {
+                if (ball.checkCollision(paddle1))
+                {
+                    ball.reflect(paddle1.movingTo);
+                    ball.left = paddle1.right;
+                }
+            }
+            else
+            {
+                if (ball.checkCollision(paddle2))
+                {
+                    ball.reflect(paddle2.movingTo);
+                    ball.right = paddle2.left;
+                }
+            }
+
+            if (ball.hitLeftEdge)
+            {
+                score2.increment();
+                ball.hitLeftEdge = false;
+                resetBall(true);
+            }
+            else if (ball.hitRightEdge)
+            {
+                score1.increment();
+                ball.hitRightEdge = false;
+                resetBall(false);
             }
         }
-        else
-        {
-            if (ball.checkCollision(paddle2))
-            {
-                ball.reflect(paddle2.movingTo);
-                ball.right = paddle2.left;
-            }
-        }
+    }
 
-        if (ball.hitLeftEdge)
+    void draw()
+    {
+        drawChildrenBut!("pauseText");
+        if (paused)
         {
-            score2.increment();
-            ball.hitLeftEdge = false;
-            resetBall(true);
-        }
-        else if (ball.hitRightEdge)
-        {
-            score1.increment();
-            ball.hitRightEdge = false;
-            resetBall(false);
+            pauseText.draw();
         }
     }
 }
