@@ -1,8 +1,9 @@
 import cdefs;
 import objects;
+import object_list;
 import raylib;
 
-PongGame game;
+Game!2 game;
 
 extern(C)
 void UpdateDrawFrame()
@@ -29,7 +30,7 @@ void main()
     }
     InitWindow(800, 600, "PongStruct");
 
-    game.initialize();
+    game.addObject(PongGame.create());
 
     version (WebAssembly)
     {

@@ -90,6 +90,15 @@ mixin template GameObject()
             drawChildren();
         }
     }
+
+    static T* create()
+    {
+        import core.stdc.stdlib;
+        typeof(return) obj = cast(T*) malloc(T.sizeof);
+        *obj = T.init;
+        obj.initialize();
+        return obj;
+    }
 }
 
 

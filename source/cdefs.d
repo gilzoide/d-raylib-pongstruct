@@ -12,3 +12,8 @@ version (WebAssembly)
     alias em_callback_func = void function();
     void emscripten_set_main_loop(em_callback_func, int, int);
 }
+
+// This is somehow used by D, but not provided by any linked library with betterC
+void __assert(void *, void *, int)
+{
+}
