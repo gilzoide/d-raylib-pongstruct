@@ -12,3 +12,4 @@ enum paddleHeight = 100;
 enum paddleVelocity = 400;
 
 enum scoreFontSize = 34;
+enum pausedFontSize = 70;

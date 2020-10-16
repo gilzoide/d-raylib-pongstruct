@@ -57,6 +57,18 @@ mixin template GameObject()
         }
     }
 
+    void drawChildrenBut(names...)()
+    {
+        import std.algorithm.comparison;
+        static foreach (i, fieldName; FieldNameTuple!T)
+        {
+            static if (!fieldName.among(names) && hasMember!(Fields!T[i], "draw"))
+            {
+                __traits(getMember, this, fieldName).draw();
+            }
+        }
+    }
+
     static if (!hasMember!(T, "initialize"))
     {
         void initialize()

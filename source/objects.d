@@ -168,6 +168,7 @@ struct PongGame
 {
     mixin GameObject;
 
+    bool paused;
     Paddle paddle1;
     Paddle paddle2;
 
@@ -201,6 +202,13 @@ struct PongGame
             center: { windowWidth * 0.5, windowHeight * 0.5 },
             radius: 15,
         },
+    };
+
+    CenteredText pauseText = {
+        x: windowWidth / 2,
+        y: windowHeight / 2,
+        fontSize: 70,
+        text: "PAUSED",
     };
 
     void initialize()
@@ -258,47 +266,64 @@ struct PongGame
 
     void update(float dt)
     {
-        version (TouchSupport)
+        if (IsKeyPressed(KeyboardKey.KEY_ENTER))
         {
-            paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
-            paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
-        }
-        else
-        {
-            paddle1.targetY = paddleTargetY(paddle1, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
-            paddle2.targetY = paddleTargetY(paddle2, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+            paused = !paused;
         }
 
-        updateChildren(dt);
-
-        if (ball.center.x < windowWidth * 0.5)
+        if (!paused)
         {
-            if (ball.checkCollision(paddle1))
+            version (TouchSupport)
             {
-                ball.reflect(paddle1.movingTo);
-                ball.left = paddle1.right;
+                paddle1.targetY = paddleTargetY(paddle1, paddle1TouchArea, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+                paddle2.targetY = paddleTargetY(paddle2, paddle2TouchArea, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+            }
+            else
+            {
+                paddle1.targetY = paddleTargetY(paddle1, KeyboardKey.KEY_W, KeyboardKey.KEY_S);
+                paddle2.targetY = paddleTargetY(paddle2, KeyboardKey.KEY_UP, KeyboardKey.KEY_DOWN);
+            }
+
+            updateChildren(dt);
+
+            if (ball.center.x < windowWidth * 0.5)
+            {
+                if (ball.checkCollision(paddle1))
+                {
+                    ball.reflect(paddle1.movingTo);
+                    ball.left = paddle1.right;
+                }
+            }
+            else
+            {
+                if (ball.checkCollision(paddle2))
+                {
+                    ball.reflect(paddle2.movingTo);
+                    ball.right = paddle2.left;
+                }
+            }
+
+            if (ball.hitLeftEdge)
+            {
+                score2.increment();
+                ball.hitLeftEdge = false;
+                resetBall(true);
+            }
+            else if (ball.hitRightEdge)
+            {
+                score1.increment();
+                ball.hitRightEdge = false;
+                resetBall(false);
             }
         }
-        else
-        {
-            if (ball.checkCollision(paddle2))
-            {
-                ball.reflect(paddle2.movingTo);
-                ball.right = paddle2.left;
-            }
-        }
+    }
 
-        if (ball.hitLeftEdge)
+    void draw()
+    {
+        drawChildrenBut!("pauseText");
+        if (paused)
         {
-            score2.increment();
-            ball.hitLeftEdge = false;
-            resetBall(true);
-        }
-        else if (ball.hitRightEdge)
-        {
-            score1.increment();
-            ball.hitRightEdge = false;
-            resetBall(false);
+            pauseText.draw();
         }
     }
 }
