@@ -46,6 +46,9 @@ $(WIN32_BUILD_EXE): $(WIN32_BUILD_LIB)
 
 win32: $(WIN32_BUILD_EXE)
 
+win32-docker: $(WIN32_BUILD_LIB)
+	docker run -v $(CURDIR):/workdir toshiara/mingw32-i686 make -C /workdir $(WIN32_BUILD_EXE)
+
 zip-win32: win32
 	cd $(WIN32_BUILD_PATH) && zip $(PACKAGE)-win32 *.{dll,exe}
 
