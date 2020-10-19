@@ -68,6 +68,9 @@ $(LINUX32_BUILD_EXE): $(LINUX32_BUILD_LIB)
 
 linux32: $(LINUX32_BUILD_EXE)
 
+linux32-docker: $(LINUX32_BUILD_LIB)
+	docker run -v $(CURDIR):/workdir i386/gcc make -C /workdir linux32
+
 zip-linux32: linux32
 	cd $(LINUX32_BUILD_PATH) && zip $(PACKAGE)-linux32 $(PACKAGE) *.so* *.sh
 
@@ -80,6 +83,9 @@ $(LINUX64_BUILD_EXE): $(LINUX64_BUILD_LIB)
 	$(LINUX64_CC) $^ -o $@ $(LINUX64_FLAGS)
 
 linux64: $(LINUX64_BUILD_EXE)
+
+linux64-docker: $(LINUX64_BUILD_LIB)
+	docker run -v $(CURDIR):/workdir gcc make -C /workdir linux64
 
 zip-linux64: linux64
 	cd $(LINUX64_BUILD_PATH) && zip $(PACKAGE)-linux64 $(PACKAGE) *.so* *.sh
@@ -121,4 +127,5 @@ zip-web: web
 
 
 all: win32 linux32 linux64 osx web
+all-docker: win32-docker linux32-docker linux64-docker osx-docker web-docker
 zip-all: zip-win32 zip-linux32 zip-linux64 zip-osx zip-web 
