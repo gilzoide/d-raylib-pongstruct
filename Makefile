@@ -53,7 +53,7 @@ $(WIN32_BUILD_EXE): $(WIN32_BUILD_LIB)
 win32: $(WIN32_BUILD_EXE)
 
 win32-docker: $(WIN32_BUILD_LIB)
-	docker run -v $(CURDIR):/workdir toshiara/mingw32-i686 make -C /workdir $(WIN32_BUILD_EXE)
+	docker run -v $(CURDIR):/workdir toshiara/mingw32-i686 make -C /workdir win32
 
 zip-win32: win32
 	cd $(WIN32_BUILD_PATH) && zip $(PACKAGE)-win32 *.{dll,exe}
@@ -95,7 +95,7 @@ $(OSX_BUILD_EXE): $(OSX_BUILD_LIB)
 osx: $(OSX_BUILD_EXE)
 
 osx-docker: $(OSX_BUILD_LIB)
-	docker run -v $(CURDIR):/workdir nemirtingas/osxcross:SDK10.15 make -C /workdir $(OSX_BUILD_EXE)
+	docker run -v $(CURDIR):/workdir nemirtingas/osxcross:SDK10.15 make -C /workdir osx
 
 zip-osx: osx
 	cd $(OSX_BUILD_PATH) && zip $(PACKAGE)-osx $(PACKAGE) *.dylib* *.sh
@@ -109,6 +109,9 @@ $(WEB_BUILD_EXE): $(WEB_BUILD_LIB) $(WEB_RAYLIB)
 	$(WEB_CC) $^ $(WEB_FLAGS) -o $@
 
 web: $(WEB_BUILD_EXE)
+
+web-docker: $(WEB_BUILD_LIB)
+	docker run -v $(CURDIR):/workdir emscripten/emsdk make -C /workdir web
 
 web-host:
 	http-server -c-1 $(WEB_BUILD_PATH)
