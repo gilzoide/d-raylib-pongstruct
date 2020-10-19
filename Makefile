@@ -22,6 +22,12 @@ LINUX64_BUILD_PATH=build/linux64
 LINUX64_BUILD_LIB=$(LINUX64_BUILD_PATH)/lib$(PACKAGE).a
 LINUX64_BUILD_EXE=$(LINUX64_BUILD_PATH)/$(PACKAGE)
 
+OSX_CC=o64-clang
+OSX_FLAGS=-Llib/raylib-bin/osx.x86_64 -lraylib
+OSX_BUILD_PATH=build/osx
+OSX_BUILD_LIB=$(OSX_BUILD_PATH)/lib$(PACKAGE).a
+OSX_BUILD_EXE=$(OSX_BUILD_PATH)/$(PACKAGE)
+
 WEB_CC=emcc
 WEB_FLAGS=-s USE_GLFW=3
 WEB_BUILD=build/web
@@ -79,6 +85,22 @@ zip-linux64: linux64
 	cd $(LINUX64_BUILD_PATH) && zip $(PACKAGE)-linux64 $(PACKAGE) *.so* *.sh
 
 
+# OSX
+$(OSX_BUILD_LIB): dub.json source/
+	dub build --compiler=ldc --config=osx --build=$(BUILD) --parallel $(DUB_FLAGS)
+
+$(OSX_BUILD_EXE): $(OSX_BUILD_LIB)
+	$(OSX_CC) $^ -o $@ $(OSX_FLAGS)
+
+osx: $(OSX_BUILD_EXE)
+
+osx-docker: $(OSX_BUILD_LIB)
+	docker run -v $(CURDIR):/workdir nemirtingas/osxcross:SDK10.15 make -C /workdir $(OSX_BUILD_EXE)
+
+zip-osx: osx
+	cd $(OSX_BUILD_PATH) && zip $(PACKAGE)-osx $(PACKAGE) *.dylib* *.sh
+
+
 # web
 $(WEB_BUILD_LIB): dub.json source/
 	dub build --compiler=ldc --config=web --build=$(BUILD) --parallel $(DUB_FLAGS)
@@ -95,5 +117,5 @@ zip-web: web
 	cd $(WEB_BUILD_PATH) && zip $(PACKAGE)-web *.{js,wasm,html,css}
 
 
-all: win32 linux32 linux64 web
-zip-all: zip-win32 zip-linux32 zip-linux64 zip-web 
+all: win32 linux32 linux64 osx web
+zip-all: zip-win32 zip-linux32 zip-linux64 zip-osx zip-web 

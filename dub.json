@@ -53,6 +53,17 @@
       "targetType": "staticLibrary"
     },
     {
+      "name": "osx",
+      "copyFiles": ["$PACKAGE_DIR/lib/raylib-bin/osx.x86_64/libraylib.dylib", "$PACKAGE_DIR/lib/raylib-bin/osx.x86_64/libraylib.301.dylib", "$PACKAGE_DIR/lib/raylib-bin/osx.x86_64/libraylib.3.0.0.dylib", "$PACKAGE_DIR/scripts/run.sh"],
+      "dflags": ["-mtriple=x86_64-apple-darwin"],
+      "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/osx.x86_64"],
+      "libs": ["raylib"],
+      "platforms": ["Darwin"],
+      "targetName": "rayd-base",
+      "targetPath": "build/osx",
+      "targetType": "staticLibrary"
+    },
+    {
       "name": "web",
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],
