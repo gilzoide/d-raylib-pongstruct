@@ -1,0 +1,10 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"betterclist": "0.2.1",
+		"bettercmath": "0.3.1",
+		"flyweightbyid": "0.2.1",
+		"fswatch": "0.5.1",
+		"gargula": {"path":"lib/gargula"}
+	}
+}

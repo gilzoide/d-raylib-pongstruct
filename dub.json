@@ -7,7 +7,6 @@
   "homepage": "https://github.com/gilzoide/d-raylib-pongstruct",
   "license": "public domain",
   "importPaths": [
-    "lib/raylib-d/source",
     "lib/druntime/src"
   ],
   "configurations": [
@@ -74,6 +73,9 @@
       "targetType": "staticLibrary"
     }
   ],
+  "dependencies": {
+    "gargula": { "path": "lib/gargula" }
+  },
   "targetPath": "build",
   "targetType": "executable"
 }

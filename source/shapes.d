@@ -1,10 +1,10 @@
 module shapes;
 
-import raylib;
+import gargula;
 
 struct Circle
 {
-	Vector2 center = { 0, 0 };
+	Vector2 center = 0;
 	float radius = 10;
 
     @property float top() const
@@ -53,11 +53,11 @@ struct Circle
         return CheckCollisionCircleRec(center, radius, rect);
     }
 
-    void draw(Color color = Colors.WHITE) const
+    void draw(Color color = WHITE) const
     {
         DrawCircleV(center, radius, color);
     }
-    void drawGradient(Color color1 = Colors.WHITE, Color color2 = Colors.BLACK) const
+    void drawGradient(Color color1 = WHITE, Color color2 = BLACK) const
     {
         DrawCircleGradient(cast(int) center.x, cast(int) center.y, radius, color1, color2);
     }
@@ -68,27 +68,51 @@ struct Frame
     Rectangle rect;
     alias rect this;
 
+    static typeof(this) from(float x, float y, float width, float height)
+    {
+        return from(Vector2(x, y), Vector2(width, height));
+    }
+    static typeof(this) from(Vector2 origin, Vector2 size)
+    {
+        typeof(return) obj = {
+            rect: { origin, size },
+        };
+        return obj;
+    }
+    static typeof(this) from(Rectangle rect)
+    {
+        typeof(return) obj = {
+            rect: rect,
+        };
+        return obj;
+    }
+
+    Frame inset(float x, float y)
+    {
+        return Frame.from(left + x, top + y, width - 2 * x, height - 2 * y);
+    }
+
     @property float top() const
     {
-        return rect.y;
+        return rect.start.y;
     }
     @property void top(float value)
     {
         rect.height = bottom() - value;
-        rect.y = value;
+        rect.start.y = value;
     }
     @property float left() const
     {
-        return rect.x;
+        return rect.start.x;
     }
     @property void left(float value)
     {
         rect.width = right() - value;
-        rect.x = value;
+        rect.start.x = value;
     }
     @property float bottom() const
     {
-        return rect.y + rect.height;
+        return rect.start.y + rect.height;
     }
     @property void bottom(float value)
     {
@@ -96,7 +120,7 @@ struct Frame
     }
     @property float right() const
     {
-        return rect.x + rect.width;
+        return rect.start.x + rect.width;
     }
     @property void right(float value)
     {
@@ -105,19 +129,19 @@ struct Frame
 
     @property float centerX() const
     {
-        return rect.x + rect.width * 0.5;
+        return rect.start.x + rect.width * 0.5;
     }
     @property void centerX(float value)
     {
-        rect.x = value - rect.width * 0.5;
+        rect.start.x = value - rect.width * 0.5;
     }
     @property float centerY() const
     {
-        return rect.y + rect.height * 0.5;
+        return rect.start.y + rect.height * 0.5;
     }
     @property void centerY(float value)
     {
-        rect.y = value - rect.height * 0.5;
+        rect.start.y = value - rect.height * 0.5;
     }
     @property Vector2 center() const
     {
@@ -125,8 +149,8 @@ struct Frame
     }
     @property void center(Vector2 value)
     {
-        rect.x = value.x - rect.width * 0.5;
-        rect.y = value.y - rect.height * 0.5;
+        centerX = value.x;
+        centerY = value.y;
     }
 
     bool checkCollision(Vector2 point) const
@@ -142,22 +166,95 @@ struct Frame
         return CheckCollisionRecs(rect, other);
     }
 
-    void draw(Color color = Colors.WHITE) const
+    void draw(Color color = WHITE) const
     {
         DrawRectangleRec(rect, color);
     }
-    void drawRounded(float roundness, int segments, Color color = Colors.WHITE) const
+    void drawLines(int lineThick = 1, Color color = WHITE) const
+    {
+        DrawRectangleLinesEx(rect, lineThick, color);
+    }
+    void drawRounded(float roundness, int segments, Color color = WHITE) const
     {
         DrawRectangleRounded(rect, roundness, segments, color);
     }
 }
 
-struct CenteredText
+struct AnchoredFrame
+{
+    Frame frame;
+    alias frame this;
+
+    Vector2 anchor;
+
+    static typeof(this) from(float x, float y, float width, float height, Vector2 anchor)
+    {
+        typeof(return) obj = {
+            frame: Frame.from(x, y, width, height),
+            anchor: anchor,
+        };
+        return obj;
+    }
+    static typeof(this) from(Vector2 origin, Vector2 size, Vector2 anchor)
+    {
+        typeof(return) obj = {
+            frame: Frame.from(origin, size),
+            anchor: anchor,
+        };
+        return obj;
+    }
+    static typeof(this) from(Rectangle rect, Vector2 anchor)
+    {
+        typeof(return) obj = {
+            frame: Frame.from(rect),
+            anchor: anchor,
+        };
+        return obj;
+    }
+
+    @property float top() const
+    {
+        return rect.start.y - rect.height * anchor.y;
+    }
+    @property float left() const
+    {
+        return rect.start.x - rect.width * anchor.x;
+    }
+    @property float bottom() const
+    {
+        return top + rect.height;
+    }
+    @property float right() const
+    {
+        return left + rect.width;
+    }
+
+    @property float centerX() const
+    {
+        return top + rect.width * 0.5;
+    }
+    @property float centerY() const
+    {
+        return left + rect.height * 0.5;
+    }
+    @property Vector2 center() const
+    {
+        return Vector2(centerX, centerY);
+    }
+}
+
+struct StaticText
 {
     int fontSize = 12;
     int x, y, width;
-    Color color = Colors.WHITE;
+    Vector2 anchor = 0;
+    Color color = WHITE;
     string text = "";
+
+    @property int height()
+    {
+        return fontSize;
+    }
 
     void initialize()
     {
@@ -166,7 +263,9 @@ struct CenteredText
 
     void draw()
     {
-        DrawText(cast(const char*) text, x - width / 2, y - fontSize / 2, fontSize, color);
+        int offsetX = cast(int) (width * anchor.x);
+        int offsetY = cast(int) (height * anchor.y);
+        DrawText(cast(const char*) text, x - offsetX, y - offsetY, fontSize, color);
     }
 }
 

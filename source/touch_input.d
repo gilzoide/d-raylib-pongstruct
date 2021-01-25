@@ -1,6 +1,6 @@
-module touch_input;
+import gargula;
 
-import raylib;
+private enum MAX_TOUCH_POINTS = 10;
 
 Vector2 touchInsideRect(Rectangle rect)
 {
