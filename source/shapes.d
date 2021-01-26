@@ -53,7 +53,7 @@ struct Circle
         return CheckCollisionCircleRec(center, radius, rect);
     }
 
-    void draw(Color color = WHITE) const
+    void drawCircle(Color color = WHITE) const
     {
         DrawCircleV(center, radius, color);
     }
@@ -94,25 +94,25 @@ struct Frame
 
     @property float top() const
     {
-        return rect.start.y;
+        return rect.origin.y;
     }
     @property void top(float value)
     {
         rect.height = bottom() - value;
-        rect.start.y = value;
+        rect.origin.y = value;
     }
     @property float left() const
     {
-        return rect.start.x;
+        return rect.origin.x;
     }
     @property void left(float value)
     {
         rect.width = right() - value;
-        rect.start.x = value;
+        rect.origin.x = value;
     }
     @property float bottom() const
     {
-        return rect.start.y + rect.height;
+        return rect.origin.y + rect.height;
     }
     @property void bottom(float value)
     {
@@ -120,7 +120,7 @@ struct Frame
     }
     @property float right() const
     {
-        return rect.start.x + rect.width;
+        return rect.origin.x + rect.width;
     }
     @property void right(float value)
     {
@@ -129,19 +129,19 @@ struct Frame
 
     @property float centerX() const
     {
-        return rect.start.x + rect.width * 0.5;
+        return rect.origin.x + rect.width * 0.5;
     }
     @property void centerX(float value)
     {
-        rect.start.x = value - rect.width * 0.5;
+        rect.origin.x = value - rect.width * 0.5;
     }
     @property float centerY() const
     {
-        return rect.start.y + rect.height * 0.5;
+        return rect.origin.y + rect.height * 0.5;
     }
     @property void centerY(float value)
     {
-        rect.start.y = value - rect.height * 0.5;
+        rect.origin.y = value - rect.height * 0.5;
     }
     @property Vector2 center() const
     {
@@ -166,7 +166,7 @@ struct Frame
         return CheckCollisionRecs(rect, other);
     }
 
-    void draw(Color color = WHITE) const
+    void drawRectangle(Color color = WHITE) const
     {
         DrawRectangleRec(rect, color);
     }
@@ -214,11 +214,11 @@ struct AnchoredFrame
 
     @property float top() const
     {
-        return rect.start.y - rect.height * anchor.y;
+        return rect.origin.y - rect.height * anchor.y;
     }
     @property float left() const
     {
-        return rect.start.x - rect.width * anchor.x;
+        return rect.origin.x - rect.width * anchor.x;
     }
     @property float bottom() const
     {

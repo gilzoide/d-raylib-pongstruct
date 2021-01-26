@@ -6,9 +6,7 @@
   ],
   "homepage": "https://github.com/gilzoide/d-raylib-pongstruct",
   "license": "public domain",
-  "importPaths": [
-    "lib/druntime/src"
-  ],
+  "importPaths": ["lib/druntime/src"],
   "configurations": [
     {
       "name": "desktop",
@@ -22,7 +20,6 @@
       "dflags": ["-mtriple=i686-w64-mingw32"],
       "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/windows.x86"],
       "libs": ["raylib"],
-      "platforms": ["Windows"],
       "targetName": "rayd-base",
       "targetPath": "build/win32",
       "targetType": "staticLibrary"
@@ -34,7 +31,6 @@
       "dflags": ["-mtriple=i686-pc-linux-gnu"],
       "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/linux.x86"],
       "libs": ["raylib"],
-      "platforms": ["Linux"],
       "targetName": "rayd-base",
       "targetPath": "build/linux32",
       "targetType": "staticLibrary"
@@ -46,7 +42,6 @@
       "dflags": ["-mtriple=x86_64-pc-linux-gnu"],
       "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/linux.x86_64"],
       "libs": ["raylib"],
-      "platforms": ["Linux"],
       "targetName": "rayd-base",
       "targetPath": "build/linux64",
       "targetType": "staticLibrary"
@@ -58,7 +53,6 @@
       "dflags": ["-mtriple=x86_64-apple-darwin"],
       "lflags": ["-L$PACKAGE_DIR/lib/raylib-bin/osx.x86_64"],
       "libs": ["raylib"],
-      "platforms": ["Darwin"],
       "targetName": "rayd-base",
       "targetPath": "build/osx",
       "targetType": "staticLibrary"
@@ -68,14 +62,17 @@
       "buildOptions": ["betterC"],
       "dflags": ["-mtriple=wasm32"],
       "lflags": ["--output-bc"],
-      "platforms": ["Emscripten"],
       "targetPath": "build/web",
       "targetType": "staticLibrary"
     }
   ],
   "dependencies": {
-    "gargula": { "path": "lib/gargula" }
+    "gargula": { "path": "subprojects/gargula" }
   },
+  "copyFiles": [
+    "source/barra.png",
+    "source/bola.png"
+  ],
   "targetPath": "build",
   "targetType": "executable"
 }

@@ -6,5 +6,5 @@
 	url = https://github.com/skoppe/druntime.git
 	branch = wasm
 [submodule "lib/gargula"]
-	path = lib/gargula
+	path = subprojects/gargula
 	url = git@github.com:gilzoide/gargula.git

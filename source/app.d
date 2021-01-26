@@ -8,6 +8,10 @@ package enum GameConfig config = {
     clearColor: BLACK,
     width: windowWidth,
     height: windowHeight,
+    textures: [
+        {"bola.png", filter: FILTER_BILINEAR},
+        {"barra.png", filter: FILTER_BILINEAR},
+    ],
 };
 alias Game = GameTemplate!(config);
 
@@ -63,6 +67,7 @@ MoveDirection directionFromUpDown(bool up, bool down)
 struct Ball
 {
     mixin Node;
+    version (LDC) @disable this();
 
     Circle circle;
     alias circle this;
@@ -71,6 +76,7 @@ struct Ball
     Color color = WHITE;
     bool hitLeftEdge = false;
     bool hitRightEdge = false;
+    Game.Texture texture;
 
     void reflect(MoveDirection moving)
     {
@@ -85,6 +91,11 @@ struct Ball
                 break;
             default: break;
         }
+    }
+
+    void initialize()
+    {
+        texture = Game.Texture.bola_png;
     }
 
     void update()
@@ -110,7 +121,8 @@ struct Ball
 
     void draw()
     {
-        circle.draw(color);
+        float scale = radius / (texture.size.width * 0.5);
+        texture.draw(center - radius, 0, scale, color);
     }
 }
 
@@ -118,48 +130,49 @@ struct Paddle
 {
     mixin Node;
 
-    Frame rect = Frame.from(0, 0, paddleWidth, paddleHeight);
+    Game.SpriteRect rect = {
+        rect: { size: [paddleWidth, paddleHeight] },
+    };
     alias rect this;
 
     float linearVelocity = paddleVelocity;
-    Color color = WHITE;
 
     float targetY;
     MoveDirection movingTo;
 
+    void initialize()
+    {
+        rect.texture = Game.Texture.barra_png;
+    }
+
     void update()
     {
         const float dt = GetFrameTime();
-        float targetDelta = targetY - centerY;
+        float targetDelta = targetY - rect.center.y;
         if (targetDelta < -float.epsilon)
         {
             movingTo = MoveDirection.up;
             float delta = max(targetDelta, -dt * linearVelocity);
-            rect.start.y += delta;
-            if (rect.start.y < 0)
+            rect.origin.y += delta;
+            if (rect.origin.y < 0)
             {
-                rect.start.y = 0;
+                rect.origin.y = 0;
             }
         }
         else if (targetDelta > float.epsilon)
         {
             movingTo = MoveDirection.down;
             float delta = min(targetDelta, dt * linearVelocity);
-            rect.start.y += delta;
-            if (rect.bottom > windowHeight)
+            rect.origin.y += delta;
+            if (rect.end.y > windowHeight)
             {
-                rect.start.y = windowHeight - rect.height;
+                rect.origin.y = windowHeight - rect.height;
             }
         }
         else
         {
             movingTo = MoveDirection.none;
         }
-    }
-    
-    void draw()
-    {
-        rect.drawRounded(rect.width, 12, color);
     }
 }
 
@@ -220,17 +233,17 @@ struct PongGame
     Ball ball = {
         circle: {
             center: Game.config.size / 2,
-            radius: 15,
+            radius: 32,
         },
     };
 
-    StaticText pauseText = {
-        x: windowWidth / 2,
-        y: windowHeight / 2,
-        anchor: 0.5,
-        fontSize: pausedFontSize,
-        text: "PAUSED",
-    };
+    //StaticText pauseText = {
+        //x: windowWidth / 2,
+        //y: windowHeight / 2,
+        //anchor: 0.5,
+        //fontSize: pausedFontSize,
+        //text: "PAUSED",
+    //};
 
     //Menu menu = {};
 
@@ -240,10 +253,9 @@ struct PongGame
     }
     void lateInitialize()
     {
-        paddle1.start.x = paddleWidth * 0.5;
-        paddle1.centerY = 0.5 * windowHeight;
-        paddle2.start.x = windowWidth - paddleWidth * 1.5;
-        paddle2.centerY = 0.5 * windowHeight;
+        paddle1.center = Vector2(paddleWidth, 0.5 * windowHeight);
+        paddle2.center = Vector2(windowWidth - paddleWidth, 0.5 * windowHeight);
+        paddle2.sourceRect.width = -paddle2.sourceRect.width;
         resetBall(true);
     }
 
@@ -256,18 +268,18 @@ struct PongGame
         }
     }
 
-    float paddleTargetY(const Frame paddle, int upKey, int downKey)
+    float paddleTargetY(const Rectangle paddle, int upKey, int downKey)
     {
         auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
         switch (movingTo)
         {
             case MoveDirection.up: return 0;
             case MoveDirection.down: return windowHeight;
-            default: return paddle.centerY;
+            default: return paddle.center.y;
         }
     }
 
-    float paddleTargetY(const Frame paddle, const Rectangle touchArea, int upKey, int downKey)
+    float paddleTargetY(const Rectangle paddle, const Rectangle touchArea, int upKey, int downKey)
     {
         auto movingTo = directionFromUpDown(IsKeyDown(upKey), IsKeyDown(downKey));
         switch (movingTo)
@@ -285,7 +297,7 @@ struct PongGame
         }
         else
         {
-            return paddle.centerY;
+            return paddle.center.y;
         }
     }
 
@@ -318,7 +330,7 @@ struct PongGame
                 if (ball.checkCollision(paddle1))
                 {
                     ball.reflect(paddle1.movingTo);
-                    ball.left = paddle1.right;
+                    ball.left = paddle1.end.x;
                 }
             }
             else
@@ -326,7 +338,7 @@ struct PongGame
                 if (ball.checkCollision(paddle2))
                 {
                     ball.reflect(paddle2.movingTo);
-                    ball.right = paddle2.left;
+                    ball.right = paddle2.origin.x;
                 }
             }
 
