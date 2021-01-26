@@ -1,7 +1,9 @@
 PACKAGE=rayd-base
 
 BUILD=debug
+CROSS_BUILD=release
 DUB_FLAGS=
+ASSETS=source/barra.png source/bola.png
 
 WIN32_CC=i686-w64-mingw32-gcc
 WIN32_FLAGS=-Llib/raylib-bin/windows.x86 -lraylib
@@ -29,7 +31,7 @@ OSX_BUILD_LIB=$(OSX_BUILD_PATH)/lib$(PACKAGE).a
 OSX_BUILD_EXE=$(OSX_BUILD_PATH)/$(PACKAGE)
 
 WEB_CC=emcc
-WEB_FLAGS=-s USE_GLFW=3
+WEB_FLAGS=-s USE_GLFW=3 $(foreach f,$(ASSETS),--embed-file $f@$(notdir $f))
 WEB_BUILD=build/web
 WEB_BUILD_PATH=build/web
 WEB_BUILD_LIB=$(WEB_BUILD_PATH)/lib$(PACKAGE).a
@@ -44,8 +46,8 @@ run:
 
 
 # Windows 32
-$(WIN32_BUILD_LIB): dub.json source/
-	dub build --compiler=ldc --config=win32 --build=$(BUILD) --parallel $(DUB_FLAGS)
+$(WIN32_BUILD_LIB): dub.json source/ subprojects/gargula/
+	dub build --compiler=ldc --config=win32 --build=$(CROSS_BUILD) --parallel $(DUB_FLAGS)
 
 $(WIN32_BUILD_EXE): $(WIN32_BUILD_LIB)
 	$(WIN32_CC) $^ -o $@ $(WIN32_FLAGS)
@@ -60,8 +62,8 @@ zip-win32: win32
 
 
 # Linux 32
-$(LINUX32_BUILD_LIB): dub.json source/
-	dub build --compiler=ldc --config=linux32 --build=$(BUILD) --parallel $(DUB_FLAGS)
+$(LINUX32_BUILD_LIB): dub.json source/ subprojects/gargula/
+	dub build --compiler=ldc --config=linux32 --build=$(CROSS_BUILD) --parallel $(DUB_FLAGS)
 
 $(LINUX32_BUILD_EXE): $(LINUX32_BUILD_LIB)
 	$(LINUX32_CC) $^ -o $@ $(LINUX32_FLAGS)
@@ -76,8 +78,8 @@ zip-linux32: linux32
 
 
 # Linux 64
-$(LINUX64_BUILD_LIB): dub.json source/
-	dub build --compiler=ldc --config=linux64 --build=$(BUILD) --parallel $(DUB_FLAGS)
+$(LINUX64_BUILD_LIB): dub.json source/ subprojects/gargula/
+	dub build --compiler=ldc --config=linux64 --build=$(CROSS_BUILD) --parallel $(DUB_FLAGS)
 
 $(LINUX64_BUILD_EXE): $(LINUX64_BUILD_LIB)
 	$(LINUX64_CC) $^ -o $@ $(LINUX64_FLAGS)
@@ -92,8 +94,8 @@ zip-linux64: linux64
 
 
 # OSX
-$(OSX_BUILD_LIB): dub.json source/
-	dub build --compiler=ldc --config=osx --build=$(BUILD) --parallel $(DUB_FLAGS)
+$(OSX_BUILD_LIB): dub.json source/ subprojects/gargula/
+	dub build --compiler=ldc --config=osx --build=$(CROSS_BUILD) --parallel $(DUB_FLAGS)
 
 $(OSX_BUILD_EXE): $(OSX_BUILD_LIB)
 	$(OSX_CC) $^ -o $@ $(OSX_FLAGS)
@@ -108,8 +110,8 @@ zip-osx: osx
 
 
 # web
-$(WEB_BUILD_LIB): dub.json source/
-	dub build --compiler=ldc --config=web --build=$(BUILD) --parallel $(DUB_FLAGS)
+$(WEB_BUILD_LIB): dub.json source/ subprojects/gargula/
+	dub build --compiler=ldc --config=web --build=$(CROSS_BUILD) --parallel $(DUB_FLAGS)
 
 $(WEB_BUILD_EXE): $(WEB_BUILD_LIB) $(WEB_RAYLIB)
 	$(WEB_CC) $^ $(WEB_FLAGS) -o $@
