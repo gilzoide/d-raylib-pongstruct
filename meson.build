@@ -10,26 +10,30 @@ is_gdc = dc.get_id() == 'gcc'
 d_args = []
 d_debug = []
 link_args = []
+link_depends = []
+link_language = meson.get_external_property('link_language', 'd')
 dependencies = []
 
 if is_debug
   d_debug += 1
   if not is_gdc
     add_global_arguments('-gc', language: 'd')
+    if get_option('betterC')
+      add_global_arguments('--betterC', language: 'd')
+    endif
   endif
 else
-  add_global_arguments( '-DNDEBUG', language: 'c')
+  add_global_arguments('-DNDEBUG', language: 'c')
   if not is_gdc
+    link_language = 'c'
     add_global_arguments('--release', '--betterC', language: 'd')
   endif
 endif
 
 if is_gdc
   add_global_arguments('-fdiagnostics-color', language: 'd')
-  link_language = 'd'
 else
   add_global_arguments('--enable-color', language: 'd')
-  link_language = meson.get_external_property('link_language', 'd')
 endif
 
 if host_machine.system() == 'emscripten'
@@ -74,6 +78,7 @@ foreach resource : resources
   if host_machine.system() == 'emscripten'
     # embed files in web build, or else textures cannot be opened
     link_args += ['--preload-file', '@0@'.format(res_target)]
+    link_depends += resource
   endif
 endforeach
 
@@ -84,6 +89,7 @@ executable('rayd-base',
   link_args: link_args,
   include_directories: inc_dir,
   dependencies: dependencies,
+  link_depends: link_depends,
   link_language: link_language,
   name_suffix: meson.get_external_property('name_suffix', []),
 )

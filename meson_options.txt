@@ -1,0 +1,1 @@
+option('betterC', type: 'boolean', value: false, description: 'Compile with -betterC on LDC debug builds')

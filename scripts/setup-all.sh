@@ -10,7 +10,8 @@ maybewipe() {
 }
 
 env DC=gdc meson setup $(maybewipe build)
-env DC=ldc meson setup $(maybewipe build/betterC)
+env DC=ldc meson setup $(maybewipe build/ldc)
+env DC=ldc meson setup -DbetterC=true $(maybewipe build/betterC)
 env DC=ldc meson setup --buildtype release $(maybewipe build/release)
 meson setup --cross-file subprojects/gargula/cross-file/web.ini $(maybewipe build/web)
 meson setup --cross-file subprojects/gargula/cross-file/web.ini -Ddebug=false -Doptimization=s $(maybewipe build/release/web)
